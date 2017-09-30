@@ -1,53 +1,58 @@
 <template>
-  <el-form class="form-container" label-width="75px" :model="postForm" :rules="rules" ref="postForm">
-    <e-col :span="23">
-      <el-form-item label="汽车品牌:" prop="branch">
-        <el-select v-model="postForm.branch" filterable clearable placeholder="请选择">
-          <el-option v-for="item in branchList" :key="item._id" :label="item.branchName" :value="item.branchName"></el-option>
-        </el-select>
-      </el-form-item>
-    </e-col>
-    <el-tooltip effect="dark" content="产品型号" placement="top">
-      <el-form-item label="产品型号:" class="postInfo-container-item" prop="productName">
-        <el-input placeholder="请输入产品型号" v-model="postForm.productName">
-        </el-input>
-      </el-form-item>
-    </el-tooltip>
+  <el-row class="form-container">
 
-    <el-form-item label="产品分类:" prop="category">
-      <el-select v-model="postForm.category" filterable clearable placeholder="请选择">
-        <el-option v-for="item in categoryList" :key="item._id" :label="item.categoryName" :value="item.categoryName"></el-option>
-      </el-select>
-    </el-form-item>
+    <el-col :span="14" :offset="5">
+      <el-form label-width="75px" :model="postForm" :rules="rules" ref="postForm">
+        <el-col :span="12">
+        <el-form-item label="汽车品牌:" prop="branch">
+          <el-select v-model="postForm.branch" filterable clearable placeholder="请选择">
+            <el-option v-for="item in branchList" :key="item._id" :label="item.branchName" :value="item.branchName"></el-option>
+          </el-select>
+        </el-form-item>
 
-    <el-form-item label="发布时间:">
-      <el-date-picker v-model="postForm.dateTime" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间">
-      </el-date-picker>
-    </el-form-item>
+        <el-form-item label="产品分类:" prop="category">
+          <el-select v-model="postForm.category" filterable clearable placeholder="请选择">
+            <el-option v-for="item in categoryList" :key="item._id" :label="item.categoryName" :value="item.categoryName"></el-option>
+          </el-select>
+        </el-form-item>
 
-    <el-form-item style="margin-bottom: 40px;" label="产品详情:">
-      <el-input type="textarea" class="article-textarea" :rows="1" autosize placeholder="请输入内容" v-model="postForm.productDetail">
-      </el-input>
-      <span class="word-counter" v-show="contentShortLength">{{contentShortLength}}字</span>
-    </el-form-item>
+        <el-form-item label="产品型号:" class="postInfo-container-item" prop="productName">
+          <el-input placeholder="请输入产品型号" v-model="postForm.productName">
+          </el-input>
+        </el-form-item>
 
-    <div style="margin-bottom: 20px;">
-      <el-upload class="image-uploader" ref="upload"
-      drag action="http://localhost:3000/upload/"
-      :before-upload="beforeUpload"
-      :on-success="handleSuccess"
-      :on-error="handleError"
-      :auto-upload="true"
-      list-type="picture">
-      <i class="el-icon-upload"></i>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-      <div class="el-upload__tip" slot="tip">只能上传jpg文件，且不超过 2M</div>
-    </el-upload>
-  </div>
-  <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm()">发布
-  </el-button>
+        <el-form-item style="margin-bottom: 20px;" label="产品详情:">
+          <el-input type="textarea" class="article-textarea" :rows="1" autosize placeholder="请输入产品介绍" v-model="postForm.productDetail">
+          </el-input>
+          <span class="word-counter" v-show="contentShortLength">{{contentShortLength}}字</span>
+        </el-form-item>
 
-</el-form>
+        <el-form-item>
+          <el-button v-loading="loading" type="primary" @click="submitForm()">发布
+          </el-button>
+        </el-form-item>
+      </el-col>
+
+      <el-col :span="11" :offset="1">
+        <div class="upload-container" style="margin-bottom: 20px;">
+          <el-upload class="image-uploader" ref="upload"
+          drag action="http://localhost:3000/upload/"
+          :before-upload="beforeUpload"
+          :on-success="handleSuccess"
+          :on-error="handleError"
+          :auto-upload="true"
+          list-type="picture">
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将产品图片文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip" align="center">只能上传jpg文件，且不超过 2M</div>
+        </el-upload>
+      </div>
+    </el-col>
+
+    </el-form>
+  </el-col>
+</el-row>
+
 </template>
 
 <script>
@@ -142,6 +147,7 @@ export default {
           // this.$refs.upload.submit()
           // this.loading = true
           this.postForm.status = 1
+          this.postForm.dateTime = new Date().toLocaleDateString()
           this.postForm.letter = this.postForm.branch.substr(0, 1)
           addProduct(this.postForm).then(response => {
             if (response.data.status === '0') {
@@ -177,15 +183,15 @@ export default {
 @import "src/styles/mixin.scss";
 
 .word-counter {
-  width: 40px;
+  width: 50px;
   position: absolute;
-  right: -10px;
+  right: -8px;
   top: 0px;
 }
 
 .form-container {
   width: 100%;
   min-width: 600px;
-  padding: 40px 45px 20px 50px;
+  padding: 100px 45px 20px 50px;
 }
 </style>
