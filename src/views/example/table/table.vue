@@ -20,9 +20,7 @@
       </el-input>
       <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" type="primary" v-waves icon="setting" @click="handleReset">重置</el-button>
-      <!-- <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加</el-button> -->
       <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">导出</el-button>
-      <!-- <el-checkbox class="filter-item" @change='tableKey=tableKey+1' v-model="showAuditor">显示审核人</el-checkbox> -->
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" element-loading-text="loading" border fit highlight-current-row style="width: 100%">
@@ -40,7 +38,7 @@
               <span>{{ scope.row.branch }}</span>
             </el-form-item>
             <el-form-item label="图片地址">
-              <span>{{ scope.row.productImage }}</span>
+              <a @click.prevent="handlePriview(scope.row.productImage)" href="#">点我看图</a>
             </el-form-item>
             <el-form-item label="商品描述">
               <span>{{ scope.row.productDetail }}</span>
@@ -128,6 +126,12 @@
         <el-col :span="10" :offset="1">
           <el-upload class="image-uploader" ref="upload"
             drag action="http://localhost:3000/upload/"
+            :before-upload="beforeUpload"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :on-change="handleChange"
+            :on-remove="handleRemove"
+            :file-list="fileList"
             :auto-upload="true">
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">将产品图片拖至此处进行替换，或<em>点击上传</em></div>
@@ -139,6 +143,9 @@
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="update">确 定</el-button>
       </div>
+    </el-dialog>
+    <el-dialog title="图片预览" :visible.sync="dialogImgVisible" size="small">
+      <img class="pan-img" :src="ewizardClap" alt="图片找不到啦">
     </el-dialog>
 
   </div>
@@ -193,8 +200,11 @@ export default {
         { key: 1, display_name: '发布中' },
         { key: 0, display_name: '已删除' }
       ],
+      fileList: [],
       dialogFormVisible: false,
       dialogStatus: '',
+      dialogImgVisible: false,
+      ewizardClap: 'https://wpimg.wallstcn.com/007ef517-bafd-4066-aae4-6883632d9646',
       textMap: {
         update: '编辑',
         create: '创建'
@@ -223,6 +233,42 @@ export default {
         this.total = result.total
         this.listLoading = false
       })
+    },
+    handleSuccess(res, file) {
+      if (res.status === '0') {
+        this.temp.productImage = res.result
+      } else {
+        this.$message.error(res.msg)
+        this.$refs.upload.clearFiles()
+      }
+    },
+    handleError(err, file) {
+      this.$message.error(err)
+    },
+    handleRemove(file) {
+      this.temp.productImage = ''
+    },
+    handleChange(file, fileList) {
+      this.fileList = fileList.slice(-1)
+    },
+    beforeUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 / 1024 < 2
+      // const isOne = this.fileList.length === 1
+      if (!isJPG) {
+        this.$message.error('上传图片只能是 JPG 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传图片大小不能超过 2MB!')
+      }
+      // if (!isOne) {
+      //   this.$message.error('只允许上传 1 张图片！')
+      // }
+      return isJPG && isLt2M
+    },
+    handlePriview(src) {
+      this.dialogImgVisible = true
+      this.ewizardClap = src
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -263,17 +309,8 @@ export default {
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
     },
-    // handleDelete(row) {
-    //   this.$notify({
-    //     title: '成功',
-    //     message: '删除成功',
-    //     type: 'success',
-    //     duration: 2000
-    //   })
-    //   const index = this.list.indexOf(row)
-    //   this.list.splice(index, 1)
-    // },
     update() {
+      console.log(this.temp)
       updateProduct(this.temp).then(response => {
         if (response.data.status === '0') {
           this.$notify({

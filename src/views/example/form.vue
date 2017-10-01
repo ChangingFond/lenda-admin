@@ -40,6 +40,9 @@
           :before-upload="beforeUpload"
           :on-success="handleSuccess"
           :on-error="handleError"
+          :on-change="handleChange"
+          :on-remove="handleRemove"
+          :file-list="fileList"
           :auto-upload="true"
           list-type="picture">
           <i class="el-icon-upload"></i>
@@ -84,6 +87,7 @@ export default {
         productImage: '', // 产品图片
         productName: '' // 文章外部作者
       },
+      fileList: [],
       branchList: [],
       categoryList: [],
       loading: false,
@@ -104,11 +108,19 @@ export default {
   },
   methods: {
     handleSuccess(res, file) {
+      console.log(this.$refs.upload)
       if (res.status === '0') {
         this.postForm.productImage = res.result
       } else {
         this.$message.error(res.msg)
+        this.$refs.upload.clearFiles()
       }
+    },
+    handleChange(file, fileList) {
+      this.fileList = fileList.slice(-1)
+    },
+    handleRemove(file) {
+      this.postForm.productImage = ''
     },
     handleError(err, file) {
       this.$message.error(err)
@@ -116,7 +128,6 @@ export default {
     beforeUpload(file) {
       const isJPG = file.type === 'image/jpeg'
       const isLt2M = file.size / 1024 / 1024 < 2
-      // const isOne = this.fileList.length === 1
 
       if (!isJPG) {
         this.$message.error('上传图片只能是 JPG 格式!')
@@ -124,9 +135,6 @@ export default {
       if (!isLt2M) {
         this.$message.error('上传图片大小不能超过 2MB!')
       }
-      // if (!isOne) {
-      //   this.$message.error('只允许上传 1 张图片！')
-      // }
       return isJPG && isLt2M
     },
     fetchData() {

@@ -47,17 +47,18 @@ router.post('/upload', function(req, res) {
     if (err) {
       res.json({
         status: '1',
-        msg: '服务器错误，请稍后再试！',
+        msg: '服务器路径错误，请稍后再试！',
         result: ''
       });
+    } else {
+      let file = req.file;
+      res.json({
+        status: '0',
+        msg: '',
+        result: file.filename
+      });
     }
-    let file = req.file;
-    res.json({
-      status: '0',
-      msg: '',
-      result: file.filename
-    });
-  })
+  });
 });
 
 /* GET product list. */

@@ -16,7 +16,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column min-width="260px" label="品牌名称">
+      <el-table-column min-width="260px" label="产品分类">
         <template scope="scope">
           <el-input @keyup.enter.native="handleModifyName(scope.row)" v-show="scope.row.edit" size="small" v-model="scope.row.categoryName"></el-input>
           <span v-show="!scope.row.edit">{{ scope.row.categoryName }}</span>
@@ -131,9 +131,17 @@ export default {
       row.edit = !row.edit
     },
     create() {
-      // this.temp._id = parseInt(Math.random() * 100) + 1024
-      // this.temp.categoryName = '原创作者'
-      // this.list.unshift(this.temp)
+      var isSame = this.list.some((item) => {
+        return item.categoryName.toLowerCase() === this.temp.categoryName.toLowerCase()
+      })
+      if (isSame) {
+        this.$message.error('该产品分类名称已存在！')
+        return
+      }
+      if (!this.temp.categoryName.trim()) {
+        this.$message.error('产品分类名称不能为空！')
+        return
+      }
       addCategory(this.temp).then(response => {
         if (response.data.status === '0') {
           this.$notify({

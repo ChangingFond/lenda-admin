@@ -149,9 +149,17 @@ export default {
       row.edit = !row.edit
     },
     create() {
-      // this.temp._id = parseInt(Math.random() * 100) + 1024
-      // this.temp.BranchName = '原创作者'
-      // this.list.unshift(this.temp)
+      var isSame = this.list.some((item) => {
+        return item.branchName.toLowerCase() === this.temp.branchName.toLowerCase()
+      })
+      if (isSame) {
+        this.$message.error('该品牌名已存在！')
+        return
+      }
+      if (!this.temp.branchName.trim()) {
+        this.$message.error('品牌名不能为空！')
+        return
+      }
       addBranch(this.temp).then(response => {
         if (response.data.status === '0') {
           this.$notify({
