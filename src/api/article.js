@@ -1,17 +1,34 @@
 import fetch from '@/utils/fetch'
 
-export function fetchList(query) {
+export function fetchProduct(query) {
   return fetch({
-    url: '/article/list',
+    url: '/product',
     method: 'get',
     params: query
   })
 }
 
-export function fetchArticle() {
+export function fetchList(query) {
   return fetch({
     url: '/article/detail',
-    method: 'get'
+    method: 'get',
+    params: query
+  })
+}
+
+export function fetchBranch(query) {
+  return fetch({
+    url: '/branch',
+    method: 'get',
+    params: query
+  })
+}
+
+export function fetchCategory(query) {
+  return fetch({
+    url: '/category',
+    method: 'get',
+    params: query
   })
 }
 
@@ -23,31 +40,42 @@ export function addProduct(product) {
   })
 }
 
-export function fetchProduct() {
+export function addBranch(branch) {
   return fetch({
-    url: '/product',
-    method: 'get'
+    url: '/branch/add',
+    method: 'post',
+    data: branch
   })
 }
 
-export function fetchBranch() {
+export function addCategory(category) {
   return fetch({
-    url: '/branch',
-    method: 'get'
+    url: '/category/add',
+    method: 'post',
+    data: category
   })
 }
 
-export function fetchCategory() {
+export function updateProduct(product) {
   return fetch({
-    url: '/category',
-    method: 'get'
+    url: '/product/update',
+    method: 'post',
+    data: product
   })
 }
 
-export function fetchPv(pv) {
+export function updateBranch(branch) {
   return fetch({
-    url: '/article/pv',
-    method: 'get',
-    params: { pv }
+    url: '/branch/update',
+    method: 'post',
+    data: branch
+  })
+}
+
+export function updateCategory(category) {
+  return fetch({
+    url: '/category/update',
+    method: 'post',
+    data: category
   })
 }

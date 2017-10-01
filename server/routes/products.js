@@ -36,31 +36,11 @@ mongoose.connection.on('disconnected', function () {
   console.log('MogoDB disconnected.');
 });
 
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
   res.send('respond with a resou');
 });
 
-/* GET product list. */
-router.get('/product', function(req, res, next) {
-  // let category = req.body.category;
-  Product.find({"category": "Radiator"}, (err, doc) => {
-    if(err) {
-      res.json({
-        status: '1',
-        msg: err.message,
-        result: ''
-      });
-    }else {
-      res.json({
-        status: '0',
-        msg: '',
-        result: doc
-      });
-    }
-  });
-});
-
-router.post('/upload', function(req, res, next) {
+router.post('/upload', function(req, res) {
   let uploadImage = upload.single("file");
 
   uploadImage(req, res, function (err) {
@@ -80,7 +60,71 @@ router.post('/upload', function(req, res, next) {
   })
 });
 
-router.post('/product/add', function(req, res, next) {
+/* GET product list. */
+router.get('/product', function(req, res) {
+
+  let params = [],
+      total = 0,
+      page = parseInt(req.param('page')),
+      pageSize = parseInt(req.param('limit')),
+      name = req.param('name'),
+      category = req.param('category'),
+      branch = req.param('branch'),
+      status = req.param('status'),
+      skip = (page - 1) * pageSize,
+      reg = new RegExp(name, 'i');
+
+  if(category) {
+    params.push({
+      category: category
+    });
+  }
+  if(branch) {
+    params.push({
+      branch: branch
+    });
+  }
+  if(status) {
+    params.push({
+      status: status
+    });
+  }
+  if(name) {
+    params.push({
+      productName: {
+        $regex : reg
+      }
+    });
+  }
+  let query = params.length === 0 ? {} : { $and: params };
+
+  let productModel = Product.find(query).skip(skip).limit(pageSize);
+
+  Product.count(query).exec((err, count) => {
+    total = count;
+  });
+  // productModel.sort({'salePrice': sort});
+  productModel.exec((err, doc) => {
+    if(err) {
+      res.json({
+        status: '1',
+        msg: err.message,
+        result: ''
+      });
+    }else {
+      res.json({
+        status: '0',
+        msg: '',
+        result: {
+          total: total,
+          items: doc
+        }
+      });
+    }
+  });
+});
+
+router.post('/product/add', function(req, res) {
   let product = new Product(req.body);
   // console.log(req.body);
   // let product = new Product({
@@ -107,9 +151,15 @@ router.post('/product/add', function(req, res, next) {
   });
 });
 
-/* GET branch list. */
-router.get('/branch', function(req, res, next) {
-  Branch.find({}, (err, doc) => {
+router.post('/product/update', function(req, res) {
+  Product.update({ '_id': req.body._id }, {
+    'branch': req.body.branch,
+    'category': req.body.category,
+    'productDetail': req.body.productDetail,
+    'productName': req.body.productName,
+    'productImage': req.body.productImage,
+    'status': req.body.status
+  }, (err) => {
     if(err) {
       res.json({
         status: '1',
@@ -120,16 +170,134 @@ router.get('/branch', function(req, res, next) {
       res.json({
         status: '0',
         msg: '',
-        result: doc
+        result: 'success'
+      });
+    }
+  });
+});
+
+/* GET branch list. */
+router.get('/branch', function(req, res) {
+
+  let total = 0,
+      page = parseInt(req.param('page')),
+      pageSize = parseInt(req.param('limit')),
+      sort = req.param('sort') == undefined ? 1 : req.param('sort'),
+      name = req.param('name'),
+      skip = (page - 1) * pageSize,
+      reg = new RegExp(name, 'i');
+
+  let branchModel = Branch.find({ branchName: { $regex : reg } }).skip(skip).limit(pageSize);
+  branchModel.sort({ branchName: sort });
+
+  Branch.count({ branchName: { $regex : reg } }).exec((err, count) => {
+    total = count;
+  });
+  // productModel.sort({'salePrice': sort});
+  branchModel.exec((err, doc) => {
+    if(err) {
+      res.json({
+        status: '1',
+        msg: err.message,
+        result: ''
+      });
+    }else {
+      res.json({
+        status: '0',
+        msg: '',
+        result: {
+          total: total,
+          items: doc
+        }
+      });
+    }
+  });
+});
+
+router.post('/branch/add', function(req, res) {
+  let branch = new Branch(req.body);
+  branch.save((err) => {
+    if(err) {
+      res.json({
+        status: '1',
+        msg: err.message
+      });
+    } else {
+      res.json({
+        status: '0',
+        msg: '',
+        result: 'success'
+      });
+    }
+  });
+});
+
+router.post('/branch/update', function(req, res) {
+  Branch.update({ '_id': req.body._id }, {
+    'branchName': req.body.branchName
+  }, (err) => {
+    if(err) {
+      res.json({
+        status: '1',
+        msg: err.message,
+        result: ''
+      });
+    }else {
+      res.json({
+        status: '0',
+        msg: '',
+        result: 'success'
       });
     }
   });
 });
 
 /* GET category list. */
-router.get('/category', function(req, res, next) {
+router.get('/category', function(req, res) {
   // let category = req.body.category;
-  Category.find({}, (err, doc) => {
+  let name = req.param('name'),
+      reg = new RegExp(name, 'i');
+
+  Category.find({ categoryName: { $regex : reg } }, (err, doc) => {
+    if(err) {
+      res.json({
+        status: '1',
+        msg: err.message,
+        result: ''
+      });
+    } else {
+      res.json({
+        status: '0',
+        msg: '',
+        result: doc
+      });
+    }
+  });
+});
+
+router.post('/category/add', function(req, res) {
+  let category = new Category(req.body);
+  category.save((err) => {
+    if(err) {
+      res.json({
+        status: '1',
+        msg: err.message
+      });
+    } else {
+      res.json({
+        status: '0',
+        msg: '',
+        result: 'success'
+      });
+    }
+  });
+});
+
+
+router.post('/category/update', function(req, res) {
+  Category.update({ '_id': req.body._id }, {
+    'categoryName': req.body.categoryName
+  }, (err) => {
     if(err) {
       res.json({
         status: '1',
@@ -140,13 +308,13 @@ router.get('/category', function(req, res, next) {
       res.json({
         status: '0',
         msg: '',
-        result: doc
+        result: 'success'
       });
     }
   });
 });
 
-router.get('/checkLogin', function(req, res, next) {
+router.get('/checkLogin', function(req, res) {
   if(req.cookies.userId) {
     res.json({
       status: '0',
@@ -162,7 +330,7 @@ router.get('/checkLogin', function(req, res, next) {
   }
 });
 
-router.post('/logout', function(req, res, next) {
+router.post('/logout', function(req, res) {
   res.cookie('userId', '', {
     path: '/',
     maxAge: 0
@@ -174,7 +342,7 @@ router.post('/logout', function(req, res, next) {
   });
 });
 
-router.post('/login', function(req, res, next) {
+router.post('/login', function(req, res) {
   let param = {
     userName: req.body.userName,
     userPwd: req.body.userPwd
@@ -208,7 +376,7 @@ router.post('/login', function(req, res, next) {
   });
 });
 
-router.get('/cart', function(req, res, next) {
+router.get('/cart', function(req, res) {
   let userId = req.cookies.userId
   User.findOne({ userId: userId }, (err, doc) => {
     if(err) {
@@ -229,7 +397,7 @@ router.get('/cart', function(req, res, next) {
   });
 });
 
-router.get('/getCartCount', function(req, res, next) {
+router.get('/getCartCount', function(req, res) {
   let userId = req.cookies.userId
   User.findOne({ userId: userId }, (err, doc) => {
     if(err) {
@@ -254,7 +422,7 @@ router.get('/getCartCount', function(req, res, next) {
   });
 });
 
-router.get('/address', function(req, res, next) {
+router.get('/address', function(req, res) {
   let userId = req.cookies.userId
   User.findOne({ userId: userId }, (err, doc) => {
     if(err) {
@@ -275,7 +443,7 @@ router.get('/address', function(req, res, next) {
   });
 });
 
-router.post('/setDefault', function(req, res, next) {
+router.post('/setDefault', function(req, res) {
   let userId = req.cookies.userId;
   let addressId = req.body.addressId;
 
@@ -311,7 +479,7 @@ router.post('/setDefault', function(req, res, next) {
   });
 });
 
-router.post('/cartDel', function(req, res, next) {
+router.post('/cartDel', function(req, res) {
   let userId = req.cookies.userId;
   let productId = req.body.productId;
   User.update({ userId: userId }, { $pull: { 'cartList' : { 'productId': productId } } }, (err, doc) => {
@@ -331,7 +499,7 @@ router.post('/cartDel', function(req, res, next) {
   });
 });
 
-router.post('/addressDel', function(req, res, next) {
+router.post('/addressDel', function(req, res) {
   let userId = req.cookies.userId;
   let addressId = req.body.addressId;
   User.update({ userId: userId }, { $pull: { 'addressList' : { 'addressId': addressId } } }, (err, doc) => {
@@ -351,7 +519,7 @@ router.post('/addressDel', function(req, res, next) {
   });
 });
 
-router.post('/cartEdit', function(req, res, next) {
+router.post('/cartEdit', function(req, res) {
   let userId = req.cookies.userId,
       productId = req.body.productId,
       productNum = req.body.productNum,
@@ -377,7 +545,7 @@ router.post('/cartEdit', function(req, res, next) {
   });
 });
 
-router.post('/checkAll', function(req, res, next) {
+router.post('/checkAll', function(req, res) {
   let userId = req.cookies.userId,
       checkAll = req.body.checkAll;
   User.findOne({ 'userId': userId }, (err, user) => {
@@ -412,7 +580,7 @@ router.post('/checkAll', function(req, res, next) {
   });
 });
 
-router.post('/pay', function(req, res, next) {
+router.post('/pay', function(req, res) {
   let userId = req.cookies.userId;
   let orderTotal = req.body.orderTotal;
   let addressId = req.body.addressId;

@@ -1,89 +1,84 @@
 <template>
-  <div class="app-container calendar-list-container">
+  <div class="app-container calendar-list-container" style="width: 50%;margin-left: 25%">
+    <div class="filter-container">
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="支持模糊搜索" v-model="listQuery.name">
+      </el-input>
+      <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter">搜索</el-button>
+      <el-button class="filter-item" type="primary" v-waves icon="setting" @click="handleReset">重置</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加</el-button>
+    </div>
 
-    <el-table :data="list" v-loading.body="listLoading" border fit highlight-current-row style="width: 100%">
+    <el-table :data="list" v-loading.body="listLoading" border fit highlight-current-row>
 
-      <el-table-column align="center" label="序号" width="65">
+      <el-table-column align="center" label="编号" width="280">
         <template scope="scope">
-          <span>{{scope.row.id}}</span>
+          <span>{{ scope.row._id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="180px" align="center" label="时间">
+      <el-table-column min-width="260px" label="品牌名称">
         <template scope="scope">
-          <span>{{scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}')}}</span>
+          <el-input @keyup.enter.native="handleModifyName(scope.row)" v-show="scope.row.edit" size="small" v-model="scope.row.categoryName"></el-input>
+          <span v-show="!scope.row.edit">{{ scope.row.categoryName }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column min-width="300px" label="标题">
+      <el-table-column align="center" label="操作" width="180">
         <template scope="scope">
-          <span>{{scope.row.title}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="110px" align="center" label="作者">
-        <template scope="scope">
-          <span>{{scope.row.author}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="80px" label="重要性">
-        <template scope="scope">
-          <icon-svg v-for="n in +scope.row.importance" icon-class="star" class="meta-item__icon" :key="n"></icon-svg>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="阅读数" width="95">
-        <template scope="scope">
-          <span>{{scope.row.pageviews}}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column class-name="status-col" label="状态" width="90">
-        <template scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="拖拽" width="95">
-        <template scope="scope">
-          <icon-svg class='drag-handler' icon-class="drag"></icon-svg>
+          <el-button :type="scope.row.edit?'success':'primary'" @click="handleModifyName(scope.row)" size="small" icon="edit">{{ scope.row.edit?'完成':'编辑' }}</el-button>
+          <el-button icon="delete" v-if="scope.row.status!= 0" size="small" type="danger" @click="handleDelete(scope.row)">删除
+          </el-button>
         </template>
       </el-table-column>
 
     </el-table>
 
-    <div class='show-d'>默认顺序 &nbsp; {{ olderList}}</div>
-    <div class='show-d'>拖拽后顺序{{newList}}</div>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" size="tiny">
+      <el-form class="small-space" :model="temp" label-position="top" label-width="70px">
+        <el-form-item label="分类名称" placeholder="请输入产品分类名称">
+          <el-input v-model="temp.categoryName"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="create">确 定</el-button>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
-import Sortable from 'sortablejs'
+import { fetchCategory, addCategory, updateCategory } from '@/api/article'
+import waves from '@/directive/waves/index.js' // 水波纹指令
 
 export default {
-  name: 'drag-table_demo',
+  name: 'category',
+  directives: {
+    waves
+  },
   data() {
     return {
       list: null,
-      total: null,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 10
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: '编辑',
+        create: '创建'
       },
-      sortable: null,
-      olderList: [],
-      newList: []
+      temp: {
+        categoryName: ''
+      },
+      listQuery: {
+        name: undefined
+      }
     }
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
         published: 'success',
-        draft: 'gray',
         deleted: 'danger'
       }
       return statusMap[status]
@@ -95,37 +90,87 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-        this.listLoading = false
-        this.olderList = this.list.map(v => v.id)
-        this.newList = this.olderList.slice()
-        this.$nextTick(() => {
-          this.setSort()
+      fetchCategory(this.listQuery).then(response => {
+        const items = response.data.result
+        this.list = items.map(v => {
+          this.$set(v, 'edit', false)
+          return v
         })
+        this.listLoading = false
       })
     },
-    setSort() {
-      const el = document.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
-      this.sortable = Sortable.create(el, {
-        onEnd: evt => {
-          const tempIndex = this.newList.splice(evt.oldIndex, 1)[0]
-          this.newList.splice(evt.newIndex, 0, tempIndex)
+    handleFilter() {
+      this.getList()
+    },
+    handleReset() {
+      this.listQuery.name = undefined
+      this.getList()
+    },
+    handleModifyName(row) {
+      if (row.edit) {
+        updateCategory(row).then(response => {
+          if (response.data.status === '0') {
+            this.$notify({
+              title: '成功',
+              message: '修改成功',
+              type: 'success',
+              duration: 2000
+            })
+          } else {
+            this.$notify({
+              title: '失败',
+              message: '修改失败，稍后再试！',
+              type: 'error',
+              duration: 2000
+            })
+          }
+        }).catch(err => {
+          this.$message.error(err)
+        })
+      }
+      row.edit = !row.edit
+    },
+    create() {
+      // this.temp._id = parseInt(Math.random() * 100) + 1024
+      // this.temp.categoryName = '原创作者'
+      // this.list.unshift(this.temp)
+      addCategory(this.temp).then(response => {
+        if (response.data.status === '0') {
+          this.$notify({
+            title: '成功',
+            message: '创建成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.getList()
+        } else {
+          this.$notify({
+            title: '失败',
+            message: '创建失败，稍后再试！',
+            type: 'error',
+            duration: 2000
+          })
         }
+      }).catch(err => {
+        this.$message.error(err)
       })
+      this.dialogFormVisible = false
+    },
+    handleCreate() {
+      this.temp.categoryName = ''
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+    },
+    handleDelete(row) {
+      this.$notify({
+        title: '成功',
+        message: '删除成功',
+        type: 'success',
+        duration: 2000
+      })
+      const index = this.list.indexOf(row)
+      this.list.splice(index, 1)
     }
   }
 }
 </script>
-
-<style scoped>
-.drag-handler{
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-}
-.show-d{
-  margin-top: 15px;
-}
-</style>

@@ -121,7 +121,7 @@ export const asyncRouterMap = [
     icon: 'component',
     noDropdown: true,
     children: [
-      { path: '', component: _import('example/table/inlineEditTable'), name: '产品分类' }
+      { path: '', component: _import('example/table/dragTable'), name: '产品分类' }
     ]
   },
   { path: '*', redirect: '/404', hidden: true }
