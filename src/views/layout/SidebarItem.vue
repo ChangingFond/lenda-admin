@@ -1,6 +1,6 @@
 <template>
   <div class='menu-wrapper'>
-    <el-menu-item class='submenu-title-noDropdown'>
+    <el-menu-item index="header" class='submenu-title-noDropdown'>
       <span>LENDA后台管理系统</span>
     </el-menu-item>
 

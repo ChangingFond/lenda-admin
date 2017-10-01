@@ -5,13 +5,13 @@
       <el-form label-width="75px" :model="postForm" :rules="rules" ref="postForm">
         <el-col :span="12">
         <el-form-item label="汽车品牌:" prop="branch">
-          <el-select v-model="postForm.branch" filterable clearable placeholder="请选择">
+          <el-select v-model="postForm.branch" filterable clearable placeholder="请选择，可输入搜索">
             <el-option v-for="item in branchList" :key="item._id" :label="item.branchName" :value="item.branchName"></el-option>
           </el-select>
         </el-form-item>
 
         <el-form-item label="产品分类:" prop="category">
-          <el-select v-model="postForm.category" filterable clearable placeholder="请选择">
+          <el-select v-model="postForm.category" filterable clearable placeholder="请选择，可输入搜索">
             <el-option v-for="item in categoryList" :key="item._id" :label="item.categoryName" :value="item.categoryName"></el-option>
           </el-select>
         </el-form-item>
@@ -131,7 +131,7 @@ export default {
     },
     fetchData() {
       fetchBranch().then(response => {
-        this.branchList = response.data.result
+        this.branchList = response.data.result.items
       }).catch(err => {
         console.log(err)
       })
@@ -147,7 +147,7 @@ export default {
           // this.$refs.upload.submit()
           // this.loading = true
           this.postForm.status = 1
-          this.postForm.dateTime = new Date().toLocaleDateString()
+          this.postForm.dateTime = Date.now()  // .toLocaleDateString()
           this.postForm.letter = this.postForm.branch.substr(0, 1)
           addProduct(this.postForm).then(response => {
             if (response.data.status === '0') {
