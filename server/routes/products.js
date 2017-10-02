@@ -66,12 +66,12 @@ router.get('/product', function(req, res) {
 
   let params = [],
       total = 0,
-      page = parseInt(req.param('page')),
-      pageSize = parseInt(req.param('limit')),
-      name = req.param('name'),
-      category = req.param('category'),
-      branch = req.param('branch'),
-      status = req.param('status'),
+      page = parseInt(req.params.page),
+      pageSize = parseInt(req.params.limit),
+      name = req.params.name,
+      category = req.params.category,
+      branch = req.params.branch,
+      status = req.params.status,
       skip = (page - 1) * pageSize,
       reg = new RegExp(name, 'i');
 
@@ -181,10 +181,10 @@ router.post('/product/update', function(req, res) {
 router.get('/branch', function(req, res) {
 
   let total = 0,
-      page = parseInt(req.param('page')),
-      pageSize = parseInt(req.param('limit')),
-      sort = req.param('sort') == undefined ? 1 : req.param('sort'),
-      name = req.param('name'),
+      page = parseInt(req.params.page),
+      pageSize = parseInt(req.params.limit),
+      sort = req.params.sort == undefined ? 1 : req.params.sort,
+      name = req.params.name,
       skip = (page - 1) * pageSize,
       reg = new RegExp(name, 'i');
 
@@ -256,7 +256,7 @@ router.post('/branch/update', function(req, res) {
 /* GET category list. */
 router.get('/category', function(req, res) {
   // let category = req.body.category;
-  let name = req.param('name'),
+  let name = req.params.name,
       reg = new RegExp(name, 'i');
 
   Category.find({ categoryName: { $regex : reg } }, (err, doc) => {
