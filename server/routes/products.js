@@ -22,7 +22,7 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 // mongoose.connect('mongodb://root:passwd@127.0.0.1:27017/mall')
-mongoose.connect('mongodb://127.0.0.1:27017/lenda');
+mongoose.connect('mongodb://127.0.0.1:27017/lenda', { useMongoClient: true });
 
 mongoose.connection.on('connected', function () {
   console.log('MogoDB connected success.');
