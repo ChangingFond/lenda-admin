@@ -2,23 +2,17 @@
 	<div class="dashboard-editor-container">
 		<github></github>
 		<el-row class="btn-group">
-			<el-col :span="4" class='text-center'>
-				<router-link class="pan-btn blue-btn" to="/components/index">Components</router-link>
+			<el-col :span="6" class='text-center'>
+				<router-link class="pan-btn blue-btn" to="/product/publish">发布产品</router-link>
 			</el-col>
-			<el-col :span="4" class='text-center'>
-				<router-link class="pan-btn light-blue-btn" to="/charts/index">Charts</router-link>
+			<el-col :span="6" class='text-center'>
+				<router-link class="pan-btn light-blue-btn" to="/product/list">产品列表</router-link>
 			</el-col>
-			<el-col :span="4" class='text-center'>
-				<router-link class="pan-btn pink-btn" to="/excel/download">Excel</router-link>
+			<el-col :span="6" class='text-center'>
+				<router-link class="pan-btn pink-btn" to="/branch">品牌列表</router-link>
 			</el-col>
-			<el-col :span="4" class='text-center'>
-				<router-link class="pan-btn green-btn" to="/example/table/table">Table</router-link>
-			</el-col>
-			<el-col :span="4" class='text-center'>
-				<router-link class="pan-btn tiffany-btn" to="/example/form/edit">Form</router-link>
-			</el-col>
-			<el-col :span="4" class='text-center'>
-				<router-link class="pan-btn yellow-btn" to="/theme/index">Theme</router-link>
+			<el-col :span="6" class='text-center'>
+				<router-link class="pan-btn green-btn" to="/category">产品分类</router-link>
 			</el-col>
 		</el-row>
 
@@ -27,19 +21,19 @@
 				<el-card class="box-card">
 					<div slot="header" class="box-card-header">
 						<pan-thumb class="panThumb" :image="avatar"> 你的权限:
-							<span class="pan-info-roles" :key='item' v-for="item in roles">{{item}}</span>
+							<span class="pan-info-roles" :key='item' v-for="item in roles">{{ item }}</span>
 						</pan-thumb>
 					</div>
-					<span class="display_name">{{name}}</span>
+					<span class="display_name">{{ name }}</span>
 					<div class="info-item">
+            <icon-svg icon-class="trendChart1" class="dashboard-editor-icon"></icon-svg>
+            <span class="info-item-text">产品</span>
 						<count-to class="info-item-num" :startVal='0' :endVal='statisticsData.article_count' :duration='3400'></count-to>
-						<span class="info-item-text">文章</span>
-						<icon-svg icon-class="trendChart1" class="dashboard-editor-icon"></icon-svg>
 					</div>
 					<div class="info-item">
+            <icon-svg icon-class="trendChart2" class="dashboard-editor-icon"></icon-svg>
+            <span class="info-item-text">覆盖品牌</span>
 						<count-to class="info-item-num" :startVal='0' :endVal='statisticsData.pageviews_count' :duration='3600'></count-to>
-						<span class="info-item-text">浏览量</span>
-						<icon-svg icon-class="trendChart2" class="dashboard-editor-icon"></icon-svg>
 					</div>
 				</el-card>
 			</el-col>
@@ -81,8 +75,8 @@ export default {
   data() {
     return {
       statisticsData: {
-        article_count: 1024,
-        pageviews_count: 1024
+        article_count: 1238,
+        pageviews_count: 98
       }
     }
   },
