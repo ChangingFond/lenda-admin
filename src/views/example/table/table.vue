@@ -13,7 +13,7 @@
       </el-select>
 
       <el-select clearable filterable class="filter-item" style="width: 130px" v-model="listQuery.branch" placeholder="品牌">
-        <el-option v-for="item in categoryOptions" :key="item.key" :label="item.display_name" :value="item.key">
+        <el-option v-for="item in branchOptions" :key="item.key" :label="item.display_name" :value="item.key">
         </el-option>
       </el-select>
       <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="产品名称" v-model="listQuery.name">
@@ -152,16 +152,16 @@
 </template>
 
 <script>
-import { fetchProduct, updateProduct } from '@/api/article'
+import { fetchProduct, updateProduct, fetchBranch, fetchCategory } from '@/api/article'
 import waves from '@/directive/waves/index.js' // 水波纹指令
 import { parseTime } from '@/utils'
 
-const categoryOptions = [
-  { key: 'Radiator', display_name: 'Radiator' },
-  { key: 'Intercooler', display_name: 'Intercooler' },
-  { key: 'Engine', display_name: 'Engine' },
-  { key: 'Other', display_name: 'Other' }
-]
+// const categoryOptions = [
+//   { key: 'Radiator', display_name: 'Radiator' },
+//   { key: 'Intercooler', display_name: 'Intercooler' },
+//   { key: 'Engine', display_name: 'Engine' },
+//   { key: 'Other', display_name: 'Other' }
+// ]
 
 // arr to obj
 // const categoryTypeKeyValue = categoryOptions.reduce((acc, cur) => {
@@ -195,7 +195,8 @@ export default {
         // productDetail: '',
         // status: undefined
       },
-      categoryOptions,
+      categoryOptions: [],
+      branchOptions: [],
       statusOptions: [
         { key: 1, display_name: '发布中' },
         { key: 0, display_name: '已删除' }
@@ -223,6 +224,24 @@ export default {
   },
   created() {
     this.getList()
+    fetchBranch().then(response => {
+      var result = response.data.result
+      result.items.forEach((item) => {
+        this.branchOptions.push({
+          key: item.branchName,
+          display_name: item.branchName
+        })
+      })
+    })
+    fetchCategory().then(response => {
+      var result = response.data.result
+      result.forEach((item) => {
+        this.categoryOptions.push({
+          key: item.categoryName,
+          display_name: item.categoryName
+        })
+      })
+    })
   },
   methods: {
     getList() {
