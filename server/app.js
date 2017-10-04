@@ -12,7 +12,7 @@ var products = require('./routes/products');
 var app = express();
 
 app.use(cors({
-  origin:['http://localhost:9527'],
+  origin:['http://localhost:9527', 'http://www.tjlenda.com'],
   methods:['GET','POST', 'PUT', 'DELETE', 'OPTIONS'],
   alloweHeaders:['Content-Type', 'Authorization']
 }));

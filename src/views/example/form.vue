@@ -36,7 +36,7 @@
       <el-col :span="11" :offset="1">
         <div class="upload-container" style="margin-bottom: 20px;">
           <el-upload class="image-uploader" ref="upload"
-          drag action="http://localhost:3000/upload/"
+          drag action="http://www.tjlenda.com:3000/upload/"
           :before-upload="beforeUpload"
           :on-success="handleSuccess"
           :on-error="handleError"

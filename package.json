@@ -1,8 +1,8 @@
 {
-  "name": "juicy",
-  "version": "2.2.0",
+  "name": "LENDA-ADMIN",
+  "version": "1.1.0",
   "description": "A Vue.js admin",
-  "author": "Pan <panfree23@gmail.com>",
+  "author": "ChangingFond <mail@fangchengjin.cn>",
   "license": "MIT",
   "private": true,
   "scripts": {

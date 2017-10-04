@@ -108,7 +108,7 @@
 
             <el-form-item label="品牌">
               <el-select class="filter-item" filterable clearable v-model="temp.branch" placeholder="请选择">
-                <el-option v-for="item in statusOptions" :key="item.key" :label="item.display_name" :value="item.key">
+                <el-option v-for="item in branchOptions" :key="item.key" :label="item.display_name" :value="item.key">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -125,7 +125,7 @@
         </el-col>
         <el-col :span="10" :offset="1">
           <el-upload class="image-uploader" ref="upload"
-            drag action="http://localhost:3000/upload/"
+            drag action="http://www.tjlenda.com:3000/upload/"
             :before-upload="beforeUpload"
             :on-success="handleSuccess"
             :on-error="handleError"
@@ -144,7 +144,7 @@
         <el-button type="primary" @click="update">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="图片预览" :visible.sync="dialogImgVisible" size="small">
+    <el-dialog title="图片预览" :visible.sync="dialogImgVisible" size="tiny" align="center">
       <img class="pan-img" :src="ewizardClap" alt="图片找不到啦">
     </el-dialog>
 
@@ -287,7 +287,7 @@ export default {
     },
     handlePriview(src) {
       this.dialogImgVisible = true
-      this.ewizardClap = src
+      this.ewizardClap = 'http://www.tjlenda.com/images/product/' + src
     },
     handleFilter() {
       this.listQuery.page = 1
