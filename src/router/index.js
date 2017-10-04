@@ -41,7 +41,8 @@ export const constantRouterMap = [
 export default new Router({
   // mode: 'history', //后端支持可开
   scrollBehavior: () => ({ y: 0 }),
-  mode: 'history', // 是否有'#', 默认mode: 'hash'
+  base: '/admin/',
+  // mode: 'history', // 是否有'#', 默认mode: 'hash'
   routes: constantRouterMap
 })
 
