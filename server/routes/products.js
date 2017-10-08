@@ -11,7 +11,7 @@ var Category = model.category;
 //设置保存路径
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../lenda/images')
+    cb(null, '../images/product')
   },
   filename: function (req, file, cb) {
     var fileFormat = (file.originalname).split(".");
