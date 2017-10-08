@@ -99,7 +99,7 @@ router.get('/product', function(req, res) {
   }
   let query = params.length === 0 ? {} : { $and: params };
 
-  let productModel = Product.find(query).skip(skip).limit(pageSize);
+  let productModel = Product.find(query).sort({"productName": 1}).skip(skip).limit(pageSize);
 
   Product.count(query).exec((err, count) => {
     total = count;
