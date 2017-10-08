@@ -144,7 +144,7 @@
         <el-button type="primary" @click="update">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="图片预览" :visible.sync="dialogImgVisible" size="tiny" align="center">
+    <el-dialog title="图片预览" :visible.sync="dialogImgVisible" size="small" align="center">
       <img class="pan-img" :src="ewizardClap" alt="图片找不到啦">
     </el-dialog>
 
